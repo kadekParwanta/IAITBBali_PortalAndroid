@@ -3,6 +3,8 @@ package com.iaitbbali.portalandroid;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.AssetManager;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -101,7 +103,14 @@ public class MainActivity extends AppCompatActivity
         mAdapter.setOnItemClickListener(new RVAdapter.RVClickListener() {
             @Override
             public void onCardItemClick(int position, View v) {
-                Toast.makeText(MainActivity.this, "Position = " + position, Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(MainActivity.this, ScrollingActivity.class);
+                ImageView imageView = (ImageView) v.findViewById(R.id.thumbImage);
+//                Bitmap bitmap = ((BitmapDrawable)imageView.getDrawable()).getBitmap();
+//                intent.putExtra("BitmapImage", bitmap);
+
+                String htmlText = mPosts.get(position).getContent().getRendered();
+                intent.putExtra("HtmlText", htmlText);
+                startActivity(intent);
             }
 
             @Override

@@ -34,6 +34,11 @@
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings"></activity>
+
+        <activity
+            android:name=".RegisterActivity"
+            android:theme="@style/AppTheme.Dark"
+            android:label="Registration"></activity>
     </application>
 
 </manifest>

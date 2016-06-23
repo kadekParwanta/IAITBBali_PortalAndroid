@@ -65,31 +65,12 @@
                 android:layout_marginBottom="8dp">
 
                 <EditText
-                    android:id="@+id/firstName"
+                    android:id="@+id/displayName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="First Name"
-                    android:imeActionId="@+id/firstName"
-                    android:imeActionLabel="firstName"
-                    android:imeOptions="actionUnspecified"
-                    android:maxLines="1"
-                    android:singleLine="true" />
-
-            </android.support.design.widget.TextInputLayout>
-
-            <android.support.design.widget.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp">
-
-                <EditText
-                    android:id="@+id/lastname"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Last Name"
-                    android:imeActionId="@+id/lastname"
-                    android:imeActionLabel="lastname"
+                    android:hint="Display Name"
+                    android:imeActionId="@+id/displayName"
+                    android:imeActionLabel="displayName"
                     android:imeOptions="actionUnspecified"
                     android:maxLines="1"
                     android:singleLine="true" />

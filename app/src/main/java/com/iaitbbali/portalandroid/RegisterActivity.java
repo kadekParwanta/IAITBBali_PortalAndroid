@@ -3,6 +3,7 @@ package com.iaitbbali.portalandroid;
 import android.annotation.TargetApi;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -29,9 +30,19 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.iaitbbali.portalandroid.model.JSONAPI.Nonce;
+import com.iaitbbali.portalandroid.model.JSONAPI.UserReg;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import retrofit.Callback;
+import retrofit.Response;
+import retrofit.Retrofit;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
@@ -58,8 +69,12 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
 
     // UI references.
     private AutoCompleteTextView mEmailView;
-    private EditText mPasswordView;
+    private EditText mPasswordView, mUsernameView, mDisplayNameView;
     private ProgressDialog progressDialog;
+
+    private RestClient mRestClient;
+    private Nonce activeNonce;
+    private SharedPreferences mSharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +82,11 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
         setContentView(R.layout.activity_register);
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
+        mUsernameView = (EditText) findViewById(R.id.username);
+        mDisplayNameView = (EditText) findViewById(R.id.displayName);
         populateAutoComplete();
+
+        mRestClient = new RestClient(this);
 
         mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -156,6 +175,9 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
         // Store values at the time of the login attempt.
         String email = mEmailView.getText().toString();
         String password = mPasswordView.getText().toString();
+        String userName = mUsernameView.getText().toString();
+        String displayName = mDisplayNameView.getText().toString();
+
 
         boolean cancel = false;
         View focusView = null;
@@ -186,7 +208,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask(email, password);
+            mAuthTask = new UserLoginTask(email, password, userName, displayName);
             mAuthTask.execute((Void) null);
         }
     }
@@ -271,46 +293,50 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
      */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
+    public class UserLoginTask extends AsyncTask<Void, Void, UserReg> {
 
         private final String mEmail;
         private final String mPassword;
+        private final String mUserName;
+        private final String mDisplayName;
 
-        UserLoginTask(String email, String password) {
+        UserLoginTask(String email, String password, String userName, String displayName) {
             mEmail = email;
             mPassword = password;
+            mUserName = userName;
+            mDisplayName = displayName;
         }
 
         @Override
-        protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
+        protected UserReg doInBackground(Void... params) {
 
             try {
                 // Simulate network access.
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                return false;
-            }
+                Nonce nonce = mRestClient.getApiService().getNonce().execute().body();
+                UserReg userReg = mRestClient.getApiService().registerUser(mUserName,mEmail,nonce.getNonce(),mDisplayName,mPassword).execute().body();
 
-            for (String credential : DUMMY_CREDENTIALS) {
-                String[] pieces = credential.split(":");
-                if (pieces[0].equals(mEmail)) {
-                    // Account exists, return true if the password matches.
-                    return pieces[1].equals(mPassword);
-                }
+                return userReg;
+            }  catch (IOException ee) {
+                return null;
             }
-
-            // TODO: register the new account here.
-            return true;
         }
 
         @Override
-        protected void onPostExecute(final Boolean success) {
+        protected void onPostExecute(final UserReg userReg) {
             mAuthTask = null;
             showProgress(false);
 
-            if (success) {
-                Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+            if (userReg != null) {
+                mSharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCES_NAME,
+                        MODE_PRIVATE);
+                SharedPreferences.Editor prefsEditor = mSharedPreferences.edit();
+                Gson gson = new Gson();
+                String json = gson.toJson(userReg);
+                prefsEditor.putString(Constants.USERREG, json);
+                prefsEditor.apply();
+
+                Toast.makeText(RegisterActivity.this,"userReg status = " + userReg.getStatus(),Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
                 startActivity(intent);
                 finish();
             } else {

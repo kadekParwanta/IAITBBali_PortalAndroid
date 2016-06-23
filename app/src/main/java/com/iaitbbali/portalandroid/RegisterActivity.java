@@ -312,7 +312,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
 
             try {
                 // Simulate network access.
-                Nonce nonce = mRestClient.getApiService().getNonce().execute().body();
+                Nonce nonce = mRestClient.getApiService().getNonce(Constants.USER,Constants.REGISTER).execute().body();
                 UserReg userReg = mRestClient.getApiService().registerUser(mUserName,mEmail,nonce.getNonce(),mDisplayName,mPassword).execute().body();
 
                 return userReg;
@@ -327,18 +327,23 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
             showProgress(false);
 
             if (userReg != null) {
-                mSharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCES_NAME,
-                        MODE_PRIVATE);
-                SharedPreferences.Editor prefsEditor = mSharedPreferences.edit();
-                Gson gson = new Gson();
-                String json = gson.toJson(userReg);
-                prefsEditor.putString(Constants.USERREG, json);
-                prefsEditor.apply();
+                if (userReg.getStatus().equalsIgnoreCase("ok")) {
+                    mSharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCES_NAME,
+                            MODE_PRIVATE);
+                    SharedPreferences.Editor prefsEditor = mSharedPreferences.edit();
+                    Gson gson = new Gson();
+                    String json = gson.toJson(userReg);
+                    prefsEditor.putString(Constants.USERREG, json);
+                    prefsEditor.apply();
 
-                Toast.makeText(RegisterActivity.this,"userReg status = " + userReg.getStatus(),Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
-                startActivity(intent);
-                finish();
+                    Toast.makeText(RegisterActivity.this,"userReg status = " + userReg.getStatus(),Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
+                    startActivity(intent);
+                    finish();
+                } else {
+                    Toast.makeText(RegisterActivity.this,"Failed to register",Toast.LENGTH_SHORT).show();
+                }
+
             } else {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();

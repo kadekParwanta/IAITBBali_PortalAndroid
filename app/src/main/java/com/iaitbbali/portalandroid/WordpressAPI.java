@@ -1,5 +1,6 @@
 package com.iaitbbali.portalandroid;
 
+import com.iaitbbali.portalandroid.model.JSONAPI.LoginCookie;
 import com.iaitbbali.portalandroid.model.JSONAPI.Nonce;
 import com.iaitbbali.portalandroid.model.JSONAPI.UserReg;
 import com.iaitbbali.portalandroid.model.Post;
@@ -21,8 +22,8 @@ public interface WordpressAPI {
     Call<List<Post>> loadPosts();
 
 
-    @GET("/api/get_nonce?controller=user&method=register")
-    Call<Nonce> getNonce();
+    @GET("/api/get_nonce?")
+    Call<Nonce> getNonce(@Query("controller") String controller, @Query("method") String method);
 
     @GET("/api/user/register?insecure=cool")
     Call<UserReg> registerUser(@Query("username") String username,
@@ -30,4 +31,9 @@ public interface WordpressAPI {
                                @Query("nonce") String nonce,
                                @Query("display_name") String display_name,
                                @Query("user_pass") String user_pass);
+
+    @GET("api/user/generate_auth_cookie?insecure=cool")
+    Call<LoginCookie> generateAuthCookie(@Query("username") String username,
+                               @Query("password") String password,
+                               @Query("nonce") String nonce);
 }

@@ -33,6 +33,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.iaitbbali.portalandroid.model.JSONAPI.CurrentUserInfo;
 import com.iaitbbali.portalandroid.model.JSONAPI.Nonce;
 import com.iaitbbali.portalandroid.model.JSONAPI.UserReg;
 
@@ -331,10 +332,10 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
                     mSharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCES_NAME,
                             MODE_PRIVATE);
                     SharedPreferences.Editor prefsEditor = mSharedPreferences.edit();
-                    Gson gson = new Gson();
-                    String json = gson.toJson(userReg);
-                    prefsEditor.putString(Constants.USERREG, json);
+                    prefsEditor.putString(Constants.COOKIE, userReg.getCookie());
                     prefsEditor.apply();
+
+                    new GetCurrentUserTask().execute(userReg.getCookie());
 
                     Toast.makeText(RegisterActivity.this,"userReg status = " + userReg.getStatus(),Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
@@ -354,6 +355,31 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
         protected void onCancelled() {
             mAuthTask = null;
             showProgress(false);
+        }
+    }
+
+    public class GetCurrentUserTask extends AsyncTask<String, Void, CurrentUserInfo> {
+
+        @Override
+        protected CurrentUserInfo doInBackground(String... params) {
+            try {
+                return mRestClient.getApiService().getCurrentUserInfo(params[0]).execute().body();
+            }  catch (IOException ee) {
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(CurrentUserInfo currentUserInfo) {
+            super.onPostExecute(currentUserInfo);
+
+            mSharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCES_NAME,
+                    MODE_PRIVATE);
+            SharedPreferences.Editor prefsEditor = mSharedPreferences.edit();
+            Gson gson = new Gson();
+            String json = gson.toJson(currentUserInfo.getUser());
+            prefsEditor.putString(Constants.USERREG, json);
+            prefsEditor.apply();
         }
     }
 }

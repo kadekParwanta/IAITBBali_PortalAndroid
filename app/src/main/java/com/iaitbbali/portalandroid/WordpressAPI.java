@@ -1,5 +1,6 @@
 package com.iaitbbali.portalandroid;
 
+import com.iaitbbali.portalandroid.model.JSONAPI.CurrentUserInfo;
 import com.iaitbbali.portalandroid.model.JSONAPI.LoginCookie;
 import com.iaitbbali.portalandroid.model.JSONAPI.Nonce;
 import com.iaitbbali.portalandroid.model.JSONAPI.UserReg;
@@ -36,4 +37,7 @@ public interface WordpressAPI {
     Call<LoginCookie> generateAuthCookie(@Query("username") String username,
                                @Query("password") String password,
                                @Query("nonce") String nonce);
+
+    @GET("api/user/get_currentuserinfo?insecure=cool")
+    Call<CurrentUserInfo> getCurrentUserInfo(@Query("cookie") String cookie);
 }

@@ -32,6 +32,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
+import com.iaitbbali.portalandroid.model.JSONAPI.CurrentUserInfo;
 import com.iaitbbali.portalandroid.model.JSONAPI.LoginCookie;
 import com.iaitbbali.portalandroid.model.JSONAPI.Nonce;
 
@@ -322,9 +323,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     mSharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCES_NAME,
                             MODE_PRIVATE);
                     SharedPreferences.Editor prefsEditor = mSharedPreferences.edit();
+                    prefsEditor.putString(Constants.COOKIE, loginCookie.getCookie());
                     Gson gson = new Gson();
-                    String json = gson.toJson(loginCookie);
-                    prefsEditor.putString(Constants.LOGINCOOKIE, json);
+                    String json = gson.toJson(loginCookie.getUser());
+                    prefsEditor.putString(Constants.USERREG,json);
                     prefsEditor.apply();
 
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);

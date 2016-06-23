@@ -2,8 +2,10 @@ package com.iaitbbali.portalandroid;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -26,11 +28,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonElement;
+import com.iaitbbali.portalandroid.model.JSONAPI.User;
 import com.iaitbbali.portalandroid.model.Post;
 import com.iaitbbali.portalandroid.model.WordpressPosts;
 
@@ -64,6 +69,9 @@ public class MainActivity extends AppCompatActivity
     private WordpressPosts wordpressPosts;
     private RestClient mRestClient;
     private ArrayList<Post> mPosts = new ArrayList<>();
+    private SharedPreferences mSharedPreferences;
+    private User activeUser;
+    private ImageView imageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +101,22 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        mSharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCES_NAME,
+                MODE_PRIVATE);
+        String userObject = mSharedPreferences.getString(Constants.USERREG,"");
+        Gson gson = new Gson();
+        User user = gson.fromJson(userObject, User.class);
+        activeUser = user;
+        View header = navigationView.getHeaderView(0);
+        TextView userName = (TextView) header.findViewById(R.id.userName);
+        userName.setText(user.getDisplayname());
+
+        TextView email = (TextView) header.findViewById(R.id.email);
+        email.setText(user.getEmail());
+
+        imageView = (ImageView) header.findViewById(R.id.imageView);
+        loadThumbnail(user);
+
         mRecyclerView = (RecyclerView) findViewById(R.id.post_recycler_view);
         mRecyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(this);
@@ -119,6 +143,18 @@ public class MainActivity extends AppCompatActivity
                 loadPhoto(imageView);
             }
         });
+    }
+
+    private void loadThumbnail(User user) {
+        try {
+            URL url = new URL(user.getAvatar());
+            Log.d("Mainactivity","loadThumbnail " + url);
+            Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+            imageView.setImageBitmap(bmp);
+        } catch (Exception e) {
+            return;
+        }
+
     }
 
     private void loadPhoto(ImageView imageView) {

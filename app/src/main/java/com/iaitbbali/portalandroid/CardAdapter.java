@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.text.format.Time;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -67,7 +68,7 @@ public class CardAdapter extends  RecyclerView.Adapter<CardAdapter
     @Override
     public void onBindViewHolder(PostViewHolder holder, int position) {
         holder.label.setText(mDataset.get(position).getTitle());
-        holder.content.setText(mDataset.get(position).getExcerpt());
+        holder.content.setText(Html.fromHtml(mDataset.get(position).getExcerpt()));
         Author author = mDataset.get(position).getAuthor();
         holder.displayName.setText(author.getSlug());
 

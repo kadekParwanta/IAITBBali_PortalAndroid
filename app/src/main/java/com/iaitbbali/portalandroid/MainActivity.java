@@ -3,57 +3,39 @@ package com.iaitbbali.portalandroid;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonElement;
+import com.iaitbbali.portalandroid.model.JSONAPI.RecentPosts;
 import com.iaitbbali.portalandroid.model.JSONAPI.User;
-import com.iaitbbali.portalandroid.model.Post;
+import com.iaitbbali.portalandroid.model.JSONAPI.Post;
 import com.iaitbbali.portalandroid.model.WordpressPosts;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.SocketTimeoutException;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.List;
 
 import retrofit.Call;
 import retrofit.Callback;
@@ -61,7 +43,7 @@ import retrofit.Response;
 import retrofit.Retrofit;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, Callback<List<Post>> {
+        implements NavigationView.OnNavigationItemSelectedListener, Callback<RecentPosts> {
 
     private RecyclerView mRecyclerView;
     private CardAdapter mAdapter;
@@ -95,9 +77,15 @@ public class MainActivity extends AppCompatActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
+        //WP-API
         mRestClient = new RestClient(this);
-        Call<List<Post>> call = mRestClient.getApiService().loadPosts();
+//        Call<List<Post>> call = mRestClient.getApiService().loadPosts();
+//        call.enqueue(this);
+
+        //JSONAPI
+        Call<RecentPosts> call = mRestClient.getApiService().getRecentPosts();
         call.enqueue(this);
+
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
@@ -212,11 +200,19 @@ public class MainActivity extends AppCompatActivity
         imageDialog.show();
     }
 
+//    @Override
+//    public void onResponse(Response<List<Post>> response, Retrofit retrofit) {
+//        setProgressBarIndeterminateVisibility(false);
+//        mPosts.clear();
+//        mPosts.addAll(response.body());
+//        mAdapter.notifyDataSetChanged();
+//    }
+
     @Override
-    public void onResponse(Response<List<Post>> response, Retrofit retrofit) {
+    public void onResponse(Response<RecentPosts> response, Retrofit retrofit) {
         setProgressBarIndeterminateVisibility(false);
         mPosts.clear();
-        mPosts.addAll(response.body());
+        mPosts.addAll(response.body().getPosts());
         mAdapter.notifyDataSetChanged();
     }
 

@@ -3,6 +3,7 @@ package com.iaitbbali.portalandroid;
 import com.iaitbbali.portalandroid.model.JSONAPI.CurrentUserInfo;
 import com.iaitbbali.portalandroid.model.JSONAPI.LoginCookie;
 import com.iaitbbali.portalandroid.model.JSONAPI.Nonce;
+import com.iaitbbali.portalandroid.model.JSONAPI.RecentPosts;
 import com.iaitbbali.portalandroid.model.JSONAPI.UserReg;
 import com.iaitbbali.portalandroid.model.Post;
 import com.iaitbbali.portalandroid.model.WordpressPosts;
@@ -40,4 +41,7 @@ public interface WordpressAPI {
 
     @GET("api/user/get_currentuserinfo?insecure=cool")
     Call<CurrentUserInfo> getCurrentUserInfo(@Query("cookie") String cookie);
+
+    @GET("/?json=get_recent_posts")
+    Call<RecentPosts> getRecentPosts();
 }

@@ -8,8 +8,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.iaitbbali.portalandroid.model.JSONAPI.Post;
 import com.iaitbbali.portalandroid.model.Links;
-import com.iaitbbali.portalandroid.model.Post;
 import com.iaitbbali.portalandroid.model.WpFeaturedmedium;
 
 import java.util.ArrayList;
@@ -55,29 +55,17 @@ public class CardAdapter extends  RecyclerView.Adapter<CardAdapter
 
     @Override
     public void onBindViewHolder(PostViewHolder holder, int position) {
-        holder.label.setText(mDataset.get(position).getTitle().getRendered());
-        holder.content.setText(mDataset.get(position).getContent().getRendered());
-
-        String date = mDataset.get(position).getDate();
-        String[] separated = date.split("T");
-        String dateString = separated[0];
-        String time = separated[1];
-        holder.dateTime.setText(dateString + " , " + time);
+        holder.label.setText(mDataset.get(position).getTitle());
+        holder.content.setText(mDataset.get(position).getExcerpt());
+        holder.displayName.setText(mDataset.get(position).getAuthor().getSlug());
+        holder.dateTime.setText(mDataset.get(position).getDate());
 
         if (holder.image != null) {
-            Links links = mDataset.get(position).getLinks();
+            Object links = mDataset.get(position).getAttachments();
             if (links == null) {
                 return;
             }
-            List<WpFeaturedmedium> wpFeaturedmediums = links.getWpFeaturedmedia();
-            if (wpFeaturedmediums.size() > 0) {
-                WpFeaturedmedium media = wpFeaturedmediums.get(0);
-                String href = media.getHref();
-                if (!href.isEmpty()) {
-                    new WpMediaDownloaderTask(holder.image).execute(href);
-                }
-
-            }
+            //TODO Handle image attachment
 
         }
     }

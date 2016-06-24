@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, Callback<List<Post>> {
 
     private RecyclerView mRecyclerView;
-    private RVAdapter mAdapter;
+    private CardAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private WordpressPosts wordpressPosts;
     private RestClient mRestClient;
@@ -121,28 +121,28 @@ public class MainActivity extends AppCompatActivity
         mRecyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
-        mAdapter = new RVAdapter(mPosts);
+        mAdapter = new CardAdapter(mPosts);
         mRecyclerView.setAdapter(mAdapter);
 
-        mAdapter.setOnItemClickListener(new RVAdapter.RVClickListener() {
-            @Override
-            public void onCardItemClick(int position, View v) {
-                Intent intent = new Intent(MainActivity.this, ScrollingActivity.class);
-                ImageView imageView = (ImageView) v.findViewById(R.id.thumbImage);
-//                Bitmap bitmap = ((BitmapDrawable)imageView.getDrawable()).getBitmap();
-//                intent.putExtra("BitmapImage", bitmap);
-
-                String htmlText = mPosts.get(position).getContent().getRendered();
-                intent.putExtra("HtmlText", htmlText);
-                startActivity(intent);
-            }
-
-            @Override
-            public void onThumbnailClick(int position, View v) {
-                ImageView imageView = (ImageView) v;
-                loadPhoto(imageView);
-            }
-        });
+//        mAdapter.setOnItemClickListener(new RVAdapter.RVClickListener() {
+//            @Override
+//            public void onCardItemClick(int position, View v) {
+//                Intent intent = new Intent(MainActivity.this, ScrollingActivity.class);
+//                ImageView imageView = (ImageView) v.findViewById(R.id.thumbImage);
+////                Bitmap bitmap = ((BitmapDrawable)imageView.getDrawable()).getBitmap();
+////                intent.putExtra("BitmapImage", bitmap);
+//
+//                String htmlText = mPosts.get(position).getContent().getRendered();
+//                intent.putExtra("HtmlText", htmlText);
+//                startActivity(intent);
+//            }
+//
+//            @Override
+//            public void onThumbnailClick(int position, View v) {
+//                ImageView imageView = (ImageView) v;
+//                loadPhoto(imageView);
+//            }
+//        });
     }
 
     private void loadThumbnail(User user) {

@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 
 import com.google.gson.Gson;
@@ -44,10 +45,12 @@ public class ImageDownloaderTask extends AsyncTask<String, Void, Bitmap> {
         if (imageViewReference != null) {
             ImageView imageView = imageViewReference.get();
             if (imageView != null) {
+                imageView.setVisibility(View.VISIBLE);
                 if (bitmap != null) {
                     imageView.setImageBitmap(bitmap);
                 } else {
-                    Drawable placeholder = imageView.getContext().getResources().getDrawable(R.drawable.placeholder);
+                    Drawable placeholder = imageView.getContext().getDrawable(R.drawable.placeholder);
+//                    Drawable placeholder = imageView.getContext().getResources().getDrawable(R.drawable.placeholder);
                     imageView.setImageDrawable(placeholder);
                 }
             }

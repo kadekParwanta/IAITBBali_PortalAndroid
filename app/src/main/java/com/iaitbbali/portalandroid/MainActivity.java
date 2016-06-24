@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity
         TextView email = (TextView) header.findViewById(R.id.email);
         email.setText(user.getEmail());
 
-        imageView = (ImageView) header.findViewById(R.id.imageView);
+        imageView = (ImageView) header.findViewById(R.id.thumbnailImage);
         loadThumbnail(user);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.post_recycler_view);
@@ -146,15 +146,44 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void loadThumbnail(User user) {
-        try {
-            URL url = new URL(user.getAvatar());
-            Log.d("Mainactivity","loadThumbnail " + url);
-            Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
-            imageView.setImageBitmap(bmp);
-        } catch (Exception e) {
-            return;
+        new DownLoadImageTask(imageView).execute(user.getAvatar());
+    }
+
+    private class DownLoadImageTask extends AsyncTask<String,Void,Bitmap>{
+        ImageView imageView;
+
+        public DownLoadImageTask(ImageView imageView){
+            this.imageView = imageView;
         }
 
+        /*
+            doInBackground(Params... params)
+                Override this method to perform a computation on a background thread.
+         */
+        protected Bitmap doInBackground(String...urls){
+            String urlOfImage = urls[0];
+            Bitmap logo = null;
+            try{
+                InputStream is = new URL(urlOfImage).openStream();
+                /*
+                    decodeStream(InputStream is)
+                        Decode an input stream into a bitmap.
+                 */
+                logo = BitmapFactory.decodeStream(is);
+            }catch(Exception e){ // Catch the download exception
+                e.printStackTrace();
+            }
+            return logo;
+        }
+
+        /*
+            onPostExecute(Result result)
+                Runs on the UI thread after doInBackground(Params...).
+         */
+        protected void onPostExecute(Bitmap result){
+            RoundedAvatarDrawable roundedAvatarDrawable = new RoundedAvatarDrawable(result);
+            imageView.setImageDrawable(roundedAvatarDrawable);
+        }
     }
 
     private void loadPhoto(ImageView imageView) {

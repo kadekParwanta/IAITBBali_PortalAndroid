@@ -1,5 +1,8 @@
 package com.iaitbbali.portalandroid;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.Time;
@@ -10,10 +13,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.iaitbbali.portalandroid.model.JSONAPI.Attachment;
+import com.iaitbbali.portalandroid.model.JSONAPI.Author;
 import com.iaitbbali.portalandroid.model.JSONAPI.Full;
 import com.iaitbbali.portalandroid.model.JSONAPI.Medium;
 import com.iaitbbali.portalandroid.model.JSONAPI.Post;
 
+import java.io.InputStream;
+import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -62,7 +68,8 @@ public class CardAdapter extends  RecyclerView.Adapter<CardAdapter
     public void onBindViewHolder(PostViewHolder holder, int position) {
         holder.label.setText(mDataset.get(position).getTitle());
         holder.content.setText(mDataset.get(position).getExcerpt());
-        holder.displayName.setText(mDataset.get(position).getAuthor().getSlug());
+        Author author = mDataset.get(position).getAuthor();
+        holder.displayName.setText(author.getSlug());
 
 
         String myStrDate = mDataset.get(position).getDate();
@@ -87,10 +94,56 @@ public class CardAdapter extends  RecyclerView.Adapter<CardAdapter
             new ImageDownloaderTask(holder.image).execute(mediumImage.getUrl());
 
         }
+
+        if (holder.avatar != null) {
+            if (!author.getUrl().isEmpty()) {
+                new DownLoadImageTask(holder.avatar).execute(author.getUrl());
+            } else {
+                new DownLoadImageTask(holder.avatar).execute("http://gravatar.com/avatar/?s=400");
+            }
+
+        }
     }
 
     @Override
     public int getItemCount() {
         return mDataset.size();
+    }
+
+    private class DownLoadImageTask extends AsyncTask<String,Void,Bitmap> {
+        ImageView imageView;
+
+        public DownLoadImageTask(ImageView imageView){
+            this.imageView = imageView;
+        }
+
+        /*
+            doInBackground(Params... params)
+                Override this method to perform a computation on a background thread.
+         */
+        protected Bitmap doInBackground(String...urls){
+            String urlOfImage = urls[0];
+            Bitmap logo = null;
+            try{
+                InputStream is = new URL(urlOfImage).openStream();
+                /*
+                    decodeStream(InputStream is)
+                        Decode an input stream into a bitmap.
+                 */
+                logo = BitmapFactory.decodeStream(is);
+            }catch(Exception e){ // Catch the download exception
+                e.printStackTrace();
+            }
+            return logo;
+        }
+
+        /*
+            onPostExecute(Result result)
+                Runs on the UI thread after doInBackground(Params...).
+         */
+        protected void onPostExecute(Bitmap result){
+            RoundedAvatarDrawable roundedAvatarDrawable = new RoundedAvatarDrawable(result);
+            imageView.setImageDrawable(roundedAvatarDrawable);
+        }
     }
 }

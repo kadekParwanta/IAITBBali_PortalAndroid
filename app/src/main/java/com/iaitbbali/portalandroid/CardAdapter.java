@@ -2,17 +2,22 @@ package com.iaitbbali.portalandroid;
 
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.text.format.Time;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.iaitbbali.portalandroid.model.JSONAPI.Attachment;
+import com.iaitbbali.portalandroid.model.JSONAPI.Full;
+import com.iaitbbali.portalandroid.model.JSONAPI.Medium;
 import com.iaitbbali.portalandroid.model.JSONAPI.Post;
-import com.iaitbbali.portalandroid.model.Links;
-import com.iaitbbali.portalandroid.model.WpFeaturedmedium;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -58,14 +63,28 @@ public class CardAdapter extends  RecyclerView.Adapter<CardAdapter
         holder.label.setText(mDataset.get(position).getTitle());
         holder.content.setText(mDataset.get(position).getExcerpt());
         holder.displayName.setText(mDataset.get(position).getAuthor().getSlug());
-        holder.dateTime.setText(mDataset.get(position).getDate());
+
+
+        String myStrDate = mDataset.get(position).getDate();
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            Date date = format.parse(myStrDate);
+            TimeDifference timeDifference = new TimeDifference(new Date(), date);
+            holder.dateTime.setText(timeDifference.getDifferenceString());
+        } catch (ParseException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
         if (holder.image != null) {
-            Object links = mDataset.get(position).getAttachments();
-            if (links == null) {
+            List<Attachment> attachments = mDataset.get(position).getAttachments();
+            if (attachments.size() == 0) {
                 return;
             }
-            //TODO Handle image attachment
+
+            Attachment attachment = attachments.get(0);
+            Full mediumImage = attachment.getImages().getFull();
+            new ImageDownloaderTask(holder.image).execute(mediumImage.getUrl());
 
         }
     }

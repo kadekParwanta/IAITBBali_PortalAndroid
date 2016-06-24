@@ -57,7 +57,7 @@ public class Post {
     private List<Object> comments = new ArrayList<Object>();
     @SerializedName("attachments")
     @Expose
-    private List<Object> attachments = new ArrayList<Object>();
+    private List<Attachment> attachments = new ArrayList<Attachment>();
     @SerializedName("comment_count")
     @Expose
     private Integer commentCount;
@@ -343,7 +343,7 @@ public class Post {
      * @return
      * The attachments
      */
-    public List<Object> getAttachments() {
+    public List<Attachment> getAttachments() {
         return attachments;
     }
 
@@ -352,7 +352,7 @@ public class Post {
      * @param attachments
      * The attachments
      */
-    public void setAttachments(List<Object> attachments) {
+    public void setAttachments(List<Attachment> attachments) {
         this.attachments = attachments;
     }
 

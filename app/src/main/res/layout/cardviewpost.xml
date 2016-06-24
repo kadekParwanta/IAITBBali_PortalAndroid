@@ -7,9 +7,9 @@
     android:layout_marginLeft="@dimen/feed_item_margin"
     android:layout_marginRight="@dimen/feed_item_margin"
     android:layout_marginTop="@dimen/feed_item_margin"
+    card_view:contentPaddingBottom="10dp"
     card_view:cardCornerRadius="2dp"
     card_view:cardElevation="5dp"
-    android:background="@color/feed_bg"
     android:id="@+id/cv">
 
     <LinearLayout
